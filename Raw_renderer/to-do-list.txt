@@ -1,0 +1,6 @@
+05.02.2021
+
+@model.cpp:27 - parser needs revisiting, so it acknowledges different formats of .obj files.
+
+@Raw_renderer.cpp - We need to add a test which checks the size of our image and resizes it 
+				    to fit the image window.

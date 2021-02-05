@@ -150,6 +150,9 @@
     <ClInclude Include="dependencies\model.h" />
     <ClInclude Include="dependencies\tgaimage.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="to-do-list.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
