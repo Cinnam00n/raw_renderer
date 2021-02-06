@@ -5,7 +5,7 @@
 
 TGAColor white = TGAColor(255, 255, 255, 255);
 TGAColor red = TGAColor(255, 0, 0, 255);
-// sample change
+// sample change again
 Model* model = NULL;
 const int width = 800;
 const int height = 800;
