@@ -26,17 +26,17 @@ Model::Model(const char* filename)
             for (int i = 0;i < 3;i++) iss >> v.raw[i];
             verts_.push_back(v); 
 
-            x_max = findExtreme(v.x, 1);
-            x_min = findExtreme(v.x, 0);
-            y_max = findExtreme(v.y, 1);
-            y_min = findExtreme(v.y, 0);
+            x_max = findExtreme(v.x, 1, x_max);
+            x_min = findExtreme(v.x, 0, x_min);
+            y_max = findExtreme(v.y, 1, y_max);
+            y_min = findExtreme(v.y, 0, y_min);
 
         }
         else if (!line.compare(0, 2, "f ")) {
             std::vector<int> f;
             int itrash, idx;
             iss >> trash;   /// while loop argument needs generalizing 
-            while (iss >> idx >> trash >> itrash >> trash >> itrash) {  
+            while (iss >> idx >> trash >> itrash) {  
                 idx--; // in wavefront obj all indices start at 1, not zero
                 f.push_back(idx);
             }
@@ -45,11 +45,14 @@ Model::Model(const char* filename)
     }
     std::cerr << "# v# " << verts_.size() << " f# " << faces_.size() << std::endl;
 
-    float* max = getExtremeValues(1);
-    float* min = getExtremeValues(0);
+    float* max;
+    float* min;
 
-    std::cout << "Max values: " << max[0] << ", " << max[1] << std::endl;
-    std::cout << "Min values: " << min[0] << ", " << min[1] << std::endl;
+    max = getExtremeValues(1);
+    min = getExtremeValues(0);
+
+    std::cout << "Max values: " << *max << ", " << *(max + 1) << std::endl;
+    std::cout << "Min values: " << *min << ", " << *(min + 1) << std::endl;
 }
 
 Model::~Model() {
@@ -71,20 +74,22 @@ Vec3f Model::vert(int i) {
     return verts_[i];
 }
 
-float Model::findExtreme(float& testValue, const bool type) {
+float Model::findExtreme(float& testValue, const bool type, float& currentValue) {
+
     float result = 0;
+
     if (type) {
-        result = (testValue > result) ? testValue : result;
+        result = (testValue > currentValue) ? testValue : currentValue;
     }
     else
     {
-        result = (testValue < result) ? testValue : result;
+        result = (testValue < currentValue) ? testValue : currentValue;
     }
     return result;
 }
 
 float* Model::getExtremeValues(const bool which) {
-    float maxValues[2] = { x_max, y_max };
-    float minValues[2] = { x_min, y_min };
+    static float maxValues[2] = { x_max, y_max };
+    static float minValues[2] = { x_min, y_min };
     if (which) { return maxValues; } else { return minValues; }
 }
