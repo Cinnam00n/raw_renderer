@@ -10,18 +10,18 @@ private:
 	std::vector<std::vector<int> > faces_;
 
 public:
-	float x_max;
-	float x_min;
-	float y_max;
-	float y_min;
+	float xMax_;
+	float xMin_;
+	float yMax_;
+	float yMin_;
 	Model(const char* filename);
 	~Model();
 	int nverts();
 	int nfaces();
 	Vec3f vert(int i);
-	float findExtreme(float& testValue, const bool type, float& currentValue);
+	float findExtreme(const float& testValue, const bool type, float& currentValue) const;
 	std::vector<int> face(int idx);
-	float* getExtremeValues(const bool which);
+	float* getExtremeValues(const bool which) const;
 
 	
 };

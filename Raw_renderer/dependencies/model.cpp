@@ -3,10 +3,11 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <algorithm>
 #include "model.h"
 
 Model::Model(const char* filename) 
-    : verts_(), faces_(), x_max(0), x_min(0), y_max(0), y_min(0) {
+    : verts_(), faces_(), xMax_(0), xMin_(0), yMax_(0), yMin_(0) {
     std::ifstream in;                                           //initialize input file stream
     in.open(filename, std::ifstream::in);                       // open file
     if (in.fail()) {
@@ -26,20 +27,45 @@ Model::Model(const char* filename)
             for (int i = 0;i < 3;i++) iss >> v.raw[i];
             verts_.push_back(v); 
 
-            x_max = findExtreme(v.x, 1, x_max);
-            x_min = findExtreme(v.x, 0, x_min);
-            y_max = findExtreme(v.y, 1, y_max);
-            y_min = findExtreme(v.y, 0, y_min);
+            xMax_ = findExtreme(v.x, 1, xMax_);
+            xMin_ = findExtreme(v.x, 0, xMin_);
+            yMax_ = findExtreme(v.y, 1, yMax_);
+            yMin_ = findExtreme(v.y, 0, yMin_);
 
         }
         else if (!line.compare(0, 2, "f ")) {
             std::vector<int> f;
             int itrash, idx;
-            iss >> trash;   /// while loop argument needs generalizing 
-            while (iss >> idx >> trash >> itrash) {  
-                idx--; // in wavefront obj all indices start at 1, not zero
-                f.push_back(idx);
+            iss >> trash; 
+
+            std::string currentStr = iss.str();
+            currentStr = currentStr.erase(0, currentStr.find_first_of(" ", 0) + 1);
+            int whitespacePosition = currentStr.find_first_of(" ", 0);
+           
+            int slashCount = 0;
+
+            for (int i = 0; i < whitespacePosition; i++)
+                if (currentStr[i] == '/') slashCount++;
+
+            switch (slashCount) {
+
+            case 0 :
+                while (iss >> idx) {
+                    idx--; // in wavefront obj all indices start at 1, not zero
+                    f.push_back(idx);
+                }
+            case 1:
+                while (iss >> idx >> trash >> itrash) {
+                    idx--; // in wavefront obj all indices start at 1, not zero
+                    f.push_back(idx);
+                }
+            case 2:
+                while (iss >> idx >> trash >> itrash >> trash >> itrash) {
+                    idx--; // in wavefront obj all indices start at 1, not zero
+                    f.push_back(idx);
+                }
             }
+
             faces_.push_back(f);
         }
     }
@@ -74,7 +100,7 @@ Vec3f Model::vert(int i) {
     return verts_[i];
 }
 
-float Model::findExtreme(float& testValue, const bool type, float& currentValue) {
+float Model::findExtreme(const float& testValue, const bool type, float& currentValue) const {
 
     float result = 0;
 
@@ -88,8 +114,8 @@ float Model::findExtreme(float& testValue, const bool type, float& currentValue)
     return result;
 }
 
-float* Model::getExtremeValues(const bool which) {
-    static float maxValues[2] = { x_max, y_max };
-    static float minValues[2] = { x_min, y_min };
+float* Model::getExtremeValues(const bool which) const {
+    static float maxValues[2] = { xMax_, yMax_ };
+    static float minValues[2] = { xMin_, yMin_ };
     if (which) { return maxValues; } else { return minValues; }
 }
